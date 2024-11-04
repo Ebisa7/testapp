@@ -88,7 +88,7 @@
                 document.getElementById('fullName').textContent = `Full Name: ${fullName || 'N/A'}`;
                 document.getElementById('user-id').textContent = `User ID: ${user.id}`;
 
-                // Calculate account age
+                // Corrected ID ranges and logic
                 const userId = user.id;
                 let creationYear = 2024;  // Default year
 
@@ -108,12 +108,14 @@
                 const accountAge = currentYear - creationYear;
 
                 document.getElementById('account-age').textContent = `Account Age: ${accountAge} years`;
+
+                // Check premium status
                 document.getElementById('is-premium').textContent = `Premium Account: ${user.is_premium ? 'Yes' : 'No'}`;
 
                 // Profile picture
                 document.getElementById('profilePic').src = user.photo_url || 'default-profile-pic.png'; // Placeholder if no picture
 
-                // Save user data to Firebase automatically on load
+                // Save user data to Firebase
                 const userData = {
                     fullName: fullName,
                     userId: user.id,
