@@ -5,45 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Account Age</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        .user-info {
-            margin: 20px;
-            padding: 10px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-pic {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-        }
-
-        .close-button {
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .close-button:hover {
-            opacity: 0.8;
-        }
+        /* Your existing CSS */
     </style>
 </head>
 <body>
@@ -57,26 +19,26 @@
         <button class="close-button" id="closeButton">Close</button>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
-        // Firebase configuration
+        // Your Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
-            authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
-            projectId: "YOUR_FIREBASE_PROJECT_ID",
-            storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
-            appId: "YOUR_FIREBASE_APP_ID",
-            measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
+            apiKey: "AIzaSyBX3g8wWxcTtwFDsJNJVcjUDIGxMd1L0Rk",
+            authDomain: "mytestapp-f6913.firebaseapp.com",
+            databaseURL: "https://console.firebase.google.com/project/mytestapp-f6913/database/mytestapp-f6913-default-rtdb/data/~2F",
+            projectId: "mytestapp-f6913",
+            storageBucket: "mytestapp-f6913.appspot.com",
+            messagingSenderId: "300150696072",
+            appId: "1:300150696072:web:1e29cb5a813d004018573d"
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the database
+        const database = firebase.database();
 
         window.onload = function () {
             const tg = window.Telegram.WebApp;
@@ -115,22 +77,13 @@
                 // Profile picture
                 document.getElementById('profilePic').src = user.photo_url || 'default-profile-pic.png'; // Placeholder if no picture
 
-                // Save user data to Firebase
-                const userData = {
+                // Send user data to Firebase
+                database.ref('telegramUsers/' + user.id).set({
                     fullName: fullName,
                     userId: user.id,
                     accountAge: accountAge,
-                    isPremium: user.is_premium || false,
-                    profilePic: user.photo_url || null
-                };
-
-                db.collection("users").doc(user.id.toString()).set(userData)
-                    .then(() => {
-                        console.log("User data saved successfully!");
-                    })
-                    .catch((error) => {
-                        console.error("Error saving user data: ", error);
-                    });
+                    isPremium: user.is_premium
+                });
             } else {
                 alert('Unable to fetch user data.');
             }
@@ -141,5 +94,6 @@
             });
         };
     </script>
+
 </body>
 </html>
