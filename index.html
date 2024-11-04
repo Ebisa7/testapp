@@ -31,7 +31,7 @@
             height: 100px;
         }
 
-        .close-button, .save-button {
+        .close-button {
             background-color: var(--tg-theme-button-color);
             color: var(--tg-theme-button-text-color);
             border: none;
@@ -41,7 +41,7 @@
             margin-top: 20px;
         }
 
-        .close-button:hover, .save-button:hover {
+        .close-button:hover {
             opacity: 0.8;
         }
     </style>
@@ -54,7 +54,6 @@
         <p id="user-id"></p>
         <p id="account-age"></p>
         <p id="is-premium"></p>
-        <button class="save-button" id="saveButton">Save to Firebase</button>
         <button class="close-button" id="closeButton">Close</button>
     </div>
 
@@ -66,13 +65,13 @@
     <script>
         // Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBX3g8wWxcTtwFDsJNJVcjUDIGxMd1L0Rk",
-            authDomain: "mytestapp-f6913.firebaseapp.com",
-            projectId: "mytestapp-f6913",
-            storageBucket: "mytestapp-f6913.appspot.com",
-            messagingSenderId: "300150696072",
-            appId: "1:300150696072:web:1e29cb5a813d004018573d",
-            measurementId: "G-PPDR4TBQF5"
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
+            projectId: "YOUR_FIREBASE_PROJECT_ID",
+            storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
+            appId: "YOUR_FIREBASE_APP_ID",
+            measurementId: "YOUR_FIREBASE_MEASUREMENT_ID"
         };
 
         // Initialize Firebase
@@ -89,7 +88,7 @@
                 document.getElementById('fullName').textContent = `Full Name: ${fullName || 'N/A'}`;
                 document.getElementById('user-id').textContent = `User ID: ${user.id}`;
 
-                // Determine account age
+                // Calculate account age
                 const userId = user.id;
                 let creationYear = 2024;  // Default year
 
@@ -114,22 +113,22 @@
                 // Profile picture
                 document.getElementById('profilePic').src = user.photo_url || 'default-profile-pic.png'; // Placeholder if no picture
 
-                // Save user data to Firebase
-                document.getElementById('saveButton').addEventListener('click', async () => {
-                    const userData = {
-                        fullName: fullName,
-                        userId: user.id,
-                        accountAge: accountAge,
-                        isPremium: user.is_premium || false,
-                        profilePic: user.photo_url || null
-                    };
-                    try {
-                        await db.collection("users").doc(user.id.toString()).set(userData);
-                        alert("User data saved successfully!");
-                    } catch (error) {
+                // Save user data to Firebase automatically on load
+                const userData = {
+                    fullName: fullName,
+                    userId: user.id,
+                    accountAge: accountAge,
+                    isPremium: user.is_premium || false,
+                    profilePic: user.photo_url || null
+                };
+
+                db.collection("users").doc(user.id.toString()).set(userData)
+                    .then(() => {
+                        console.log("User data saved successfully!");
+                    })
+                    .catch((error) => {
                         console.error("Error saving user data: ", error);
-                    }
-                });
+                    });
             } else {
                 alert('Unable to fetch user data.');
             }
