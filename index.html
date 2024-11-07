@@ -1,99 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Account Age</title>
-    <style>
-        /* Your existing CSS */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Text to Firebase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h1>User Info</h1>
-    <div class="user-info">
-        <img id="profilePic" class="profile-pic" alt="Profile Picture" />
-        <p id="fullName"></p>
-        <p id="user-id"></p>
-        <p id="account-age"></p>
-        <p id="is-premium"></p>
-        <button class="close-button" id="closeButton">Close</button>
-    </div>
+  <div class="container">
+    <h1>Send Text to Firebase</h1>
+    <input type="text" id="textInput" placeholder="Enter your text here" />
+    <button id="sendButton">Send</button>
+    <p id="status"></p>
+  </div>
+  <script type="module">
+    // Import the necessary Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script>
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBX3g8wWxcTtwFDsJNJVcjUDIGxMd1L0Rk",
-            authDomain: "mytestapp-f6913.firebaseapp.com",
-            databaseURL: "https://console.firebase.google.com/project/mytestapp-f6913/database/mytestapp-f6913-default-rtdb/data/~2F",
-            projectId: "mytestapp-f6913",
-            storageBucket: "mytestapp-f6913.appspot.com",
-            messagingSenderId: "300150696072",
-            appId: "1:300150696072:web:1e29cb5a813d004018573d"
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_S5XfXJ7iyLIrPBOPkvP0110vXjzhqEg",
+      authDomain: "etndrop-bc9c3.firebaseapp.com",
+      projectId: "etndrop-bc9c3",
+      storageBucket: "etndrop-bc9c3.firebasestorage.app",
+      messagingSenderId: "1017600425514",
+      appId: "1:1017600425514:web:f65bb6ee44f86da2014d53",
+    };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Get a reference to the database
-        const database = firebase.database();
+    // DOM Elements
+    const textInput = document.getElementById("textInput");
+    const sendButton = document.getElementById("sendButton");
+    const status = document.getElementById("status");
 
-        window.onload = function () {
-            const tg = window.Telegram.WebApp;
-            const user = tg.initDataUnsafe?.user;
+    // Function to send text to Firestore
+    const sendTextToFirestore = async () => {
+      const text = textInput.value.trim();
+      if (text) {
+        try {
+          // Create a document in the Firestore collection
+          const docRef = doc(db, "messages", `message_${Date.now()}`);
+          await setDoc(docRef, { text });
+          status.textContent = "Message sent successfully!";
+          status.style.color = "green";
+          textInput.value = "";
+        } catch (error) {
+          status.textContent = "Error sending message!";
+          status.style.color = "red";
+          console.error("Error writing to Firestore:", error);
+        }
+      } else {
+        status.textContent = "Please enter some text.";
+        status.style.color = "orange";
+      }
+    };
 
-            if (user) {
-                // Display user info
-                const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-                document.getElementById('fullName').textContent = `Full Name: ${fullName || 'N/A'}`;
-                document.getElementById('user-id').textContent = `User ID: ${user.id}`;
-
-                // Corrected ID ranges and logic
-                const userId = user.id;
-                let creationYear = 2024;  // Default year
-
-                if (userId < 1000000) {
-                    creationYear = 2013;
-                } else if (userId < 100000000) {
-                    creationYear = 2016;
-                } else if (userId < 500000000) {
-                    creationYear = 2020;
-                } else if (userId < 700000000) {
-                    creationYear = 2023;
-                } else if (userId > 6000000000) {
-                    creationYear = 2023;  // Over 6 billion is recent, 2023+
-                }
-
-                const currentYear = new Date().getFullYear();
-                const accountAge = currentYear - creationYear;
-
-                document.getElementById('account-age').textContent = `Account Age: ${accountAge} years`;
-
-                // Check premium status
-                document.getElementById('is-premium').textContent = `Premium Account: ${user.is_premium ? 'Yes' : 'No'}`;
-
-                // Profile picture
-                document.getElementById('profilePic').src = user.photo_url || 'default-profile-pic.png'; // Placeholder if no picture
-
-                // Send user data to Firebase
-                database.ref('telegramUsers/' + user.id).set({
-                    fullName: fullName,
-                    userId: user.id,
-                    accountAge: accountAge,
-                    isPremium: user.is_premium
-                });
-            } else {
-                alert('Unable to fetch user data.');
-            }
-
-            // Close button functionality
-            document.getElementById('closeButton').addEventListener('click', () => {
-                tg.close();
-            });
-        };
-    </script>
-
+    // Add event listener to the send button
+    sendButton.addEventListener("click", sendTextToFirestore);
+  </script>
 </body>
 </html>
